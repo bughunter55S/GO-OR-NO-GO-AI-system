@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GO OR NO GO™ | AI Event Safety Assessment System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f1f5f9;
+    }
+    .brand-gradient {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP BANNER (Styled after Exhibit F & H) -->
+  <header class="brand-gradient text-white shadow-lg border-b-4 border-emerald-500">
+    <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-300 font-black text-2xl shadow-inner">
+          ✓
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+              <span class="text-emerald-400">GO</span> OR <span class="text-rose-400">NO GO</span><sup class="text-xs font-normal text-slate-300">TM</sup>
+            </h1>
+            <span class="text-xs uppercase tracking-widest bg-blue-800/80 text-blue-200 px-2.5 py-0.5 rounded-full font-semibold border border-blue-600">
+              SurePlan Analytics
+            </span>
+          </div>
+          <p class="text-xs md:text-sm text-slate-300 font-medium tracking-wide uppercase">
+            AI Event Safety Assessment System • Decision-Support Tool
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="loadChalmersBtn" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-lg shadow transition">
+          ⚡ Load Chalmers June 6, 2024 Audit Log (Ex. F)
+        </button>
+        <button id="clearLogBtn" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-3 py-2 rounded-lg transition">
+          Clear Audit Log
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT COLUMN: WEATHER & EVENT INPUTS -->
+    <section class="lg:col-span-7 space-y-6">
+
+      <!-- STEP 1: WEATHER INTEGRATION CARD -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded">STEP 1</span>
+            <h2 class="font-bold text-sm uppercase tracking-wider">Meteorological Data Integration</h2>
+          </div>
+          <span class="text-xs text-emerald-300 font-medium">✓ >99% Forecast Integration</span>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Mode Toggle -->
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div class="flex items-center gap-3">
+              <label class="text-xs font-bold uppercase text-slate-600">Weather Source:</label>
+              <div class="inline-flex rounded-lg border border-slate-300 bg-white p-0.5">
+                <button type="button" id="modeLiveBtn" class="px-3 py-1 text-xs font-bold rounded-md bg-blue-600 text-white transition">
+                  Live US Zip Code
+                </button>
+                <button type="button" id="modeCaseBtn" class="px-3 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition">
+                  Martin's Landing (June 2024 Ex. C)
+                </button>
+              </div>
+            </div>
+            <span id="weatherStatusBadge" class="text-xs font-semibold text-slate-500">Ready for Zip Code lookup</span>
+          </div>
+
+          <!-- Live Zip Code Lookup Bar -->
+          <div id="liveZipContainer" class="flex flex-col sm:flex-row gap-3">
+            <div class="flex-1">
+              <label for="zipInput" class="block text-xs font-bold text-slate-600 uppercase mb-1">US Zip Code</label>
+              <input id="zipInput" type="text" maxlength="5" placeholder="e.g. 02111 (Boston, MA) or 02067" value="02111"
+                class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div class="flex items-end">
+              <button type="button" id="fetchWeatherBtn"
+                class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2 rounded-lg shadow transition">
+                Fetch Live Weather
+              </button>
+            </div>
+          </div>
+
+          <!-- Case Packet Preset Selector (Hidden by default) -->
+          <div id="caseDateContainer" class="hidden">
+            <label for="caseDateSelect" class="block text-xs font-bold text-slate-600 uppercase mb-1">
+              Select Exhibit C Official NWS Observation Date (Martin's Landing, Norfolk County, MA)
+            </label>
+            <select id="caseDateSelect" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+              <option value="2024-06-07" selected>Fri, June 7, 2024 — Step Ahead Day (High: 105°F | Max Heat Index: 112°F | Sunny)</option>
+              <option value="2024-06-06">Thu, June 6, 2024 — Early Dismissal Day (High: 106°F | Max Heat Index: 112°F | Sunny)</option>
+              <option value="2024-06-05">Wed, June 5, 2024 — Planning Meeting (High: 102°F | Max Heat Index: 107°F | Mostly Sunny)</option>
+              <option value="2024-06-08">Sat, June 8, 2024 — Weekend (High: 88°F | Max Heat Index: 92°F | Partly Cloudy)</option>
+              <option value="2024-06-09">Sun, June 9, 2024 — Cold Front Passes (High: 82°F | Max Heat Index: 85°F | Mostly Sunny)</option>
+              <option value="2024-06-10">Mon, June 10, 2024 — Scheduled Rain Date (High: 77°F | Max Heat Index: 80°F | Partly Cloudy)</option>
+            </select>
+          </div>
+
+          <!-- Weather Readout Boxes -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="text-[11px] font-bold uppercase text-slate-400">Location</div>
+              <div id="wxLocation" class="text-sm font-extrabold text-slate-800 truncate mt-0.5">Martin's Landing, MA</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="text-[11px] font-bold uppercase text-slate-400">Temperature (°F)</div>
+              <div id="wxTemp" class="text-lg font-black text-slate-800 mt-0.5">105°F</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="text-[11px] font-bold uppercase text-slate-400">Max Heat Index</div>
+              <div id="wxHeatIndex" class="text-lg font-black text-rose-600 mt-0.5">112°F</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="text-[11px] font-bold uppercase text-slate-400">Conditions</div>
+              <div id="wxConditions" class="text-sm font-bold text-slate-700 mt-0.5">Sunny</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: EVENT & USER INPUT VARIABLES (Exhibit H) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="bg-emerald-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded">STEP 2</span>
+            <h2 class="font-bold text-sm uppercase tracking-wider">Event Details & User Input Variables</h2>
+          </div>
+          <span class="text-xs text-slate-300">Per GO OR NO GO™ User Guide (Ex. H)</span>
+        </div>
+
+        <form id="assessmentForm" class="p-5 space-y-5">
+          <!-- Event Metadata (From Exhibit F Header) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Event Name</label>
+              <input id="eventName" type="text" value="Step Ahead Day"
+                class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm bg-white font-semibold" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Authorized User</label>
+              <input id="userName" type="text" value="Cary Chalmers"
+                class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm bg-white font-semibold" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Expected Attendance</label>
+              <input id="attendance" type="text" value="600-1,000 attendees"
+                class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Event Location</label>
+              <input id="eventLocation" type="text" value="Outdoor athletic field/track area"
+                class="w-full rounded border border-slate-300 px-3 py-1.5 text-sm bg-white" />
+            </div>
+          </div>
+
+          <!-- 4 Core Variables from Exhibit H -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- 1. Activity Level -->
+            <div class="border border-slate-200 rounded-lg p-3.5">
+              <label for="activityLevel" class="block text-xs font-extrabold uppercase text-blue-900 mb-1">
+                1. Activity Level
+              </label>
+              <p class="text-xs text-slate-500 mb-2">Select the anticipated level of physical activity.</p>
+              <select id="activityLevel" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold bg-white">
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High" selected>High</option>
+              </select>
+            </div>
+
+            <!-- 2. Hydration Stations -->
+            <div class="border border-slate-200 rounded-lg p-3.5">
+              <label for="hydrationStations" class="block text-xs font-extrabold uppercase text-blue-900 mb-1">
+                2. Hydration Stations
+              </label>
+              <p class="text-xs text-slate-500 mb-2">Number of hydration stations available to attendees.</p>
+              <input id="hydrationStations" type="number" min="0" max="500" value="2"
+                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold bg-white" />
+            </div>
+
+            <!-- 3. Shade Coverage -->
+            <div class="border border-slate-200 rounded-lg p-3.5">
+              <label for="shadeCoverage" class="block text-xs font-extrabold uppercase text-blue-900 mb-1">
+                3. Shade Coverage
+              </label>
+              <p class="text-xs text-slate-500 mb-2">Select the amount of shade or protected space available.</p>
+              <select id="shadeCoverage" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold bg-white">
+                <option value="Limited" selected>Limited</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Extensive">Extensive</option>
+              </select>
+            </div>
+
+            <!-- 4. Scheduled Breaks -->
+            <div class="border border-slate-200 rounded-lg p-3.5">
+              <label for="scheduledBreaks" class="block text-xs font-extrabold uppercase text-blue-900 mb-1">
+                4. Scheduled Breaks
+              </label>
+              <p class="text-xs text-slate-500 mb-2">Enter how frequently organized breaks will occur.</p>
+              <select id="scheduledBreaks" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold bg-white">
+                <option value="None" selected>None</option>
+                <option value="Every 2 Hours">Every 2 Hours</option>
+                <option value="Every Hour">Every Hour</option>
+                <option value="Every 45 Minutes">Every 45 Minutes</option>
+                <option value="Every 30 Minutes">Every 30 Minutes</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Scenario Presets from Exhibit F -->
+          <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-bold text-blue-950">Quick-Fill Exhibit F Scenarios:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" data-preset="1" class="preset-btn text-xs bg-white hover:bg-blue-100 text-blue-900 border border-blue-300 font-semibold px-2.5 py-1 rounded transition">
+                Run #1 (4:12 PM • Score 41)
+              </button>
+              <button type="button" data-preset="2" class="preset-btn text-xs bg-white hover:bg-blue-100 text-blue-900 border border-blue-300 font-semibold px-2.5 py-1 rounded transition">
+                Run #2 (4:21 PM • Score 53)
+              </button>
+              <button type="button" data-preset="3" class="preset-btn text-xs bg-white hover:bg-blue-100 text-blue-900 border border-blue-300 font-semibold px-2.5 py-1 rounded transition">
+                Run #3 (4:30 PM • Score 73)
+              </button>
+            </div>
+          </div>
+
+          <button type="submit"
+            class="w-full brand-gradient hover:opacity-95 text-white font-black uppercase tracking-wider py-3.5 px-6 rounded-xl shadow-md transition text-sm">
+            Run AI Safety Assessment & Log Entry
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: LIVE SCORE GAUGE & USER GUIDE THRESHOLDS -->
+    <section class="lg:col-span-5 space-y-6">
+
+      <!-- RESULT CARD -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+          <h2 class="font-bold text-sm uppercase tracking-wider">AI Safety Score & Recommendation</h2>
+          <span id="lastReadStamp" class="text-xs text-slate-300">Entry #A-00073</span>
+        </div>
+
+        <div class="p-6 text-center space-y-4">
+          <div class="inline-flex items-center justify-center">
+            <div id="scoreCircle" class="w-36 h-36 rounded-full border-8 border-rose-500 bg-rose-50 flex flex-col items-center justify-center shadow-inner transition-all">
+              <span class="text-xs font-bold uppercase text-slate-500">Safety Score</span>
+              <span id="scoreValue" class="text-5xl font-black text-slate-900">41</span>
+              <span class="text-[11px] font-semibold text-slate-400">Range: 0–100</span>
+            </div>
+          </div>
+
+          <div>
+            <span id="recBadge" class="inline-block text-2xl font-black tracking-widest px-6 py-2 rounded-full bg-rose-600 text-white shadow">
+              NO GO
+            </span>
+          </div>
+
+          <p id="recGuidance" class="text-sm text-slate-600 font-medium bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+            Current conditions do not meet the recommended safety threshold. The event should not proceed under the conditions entered.
+          </p>
+
+          <!-- Emerson Smith Guardrail Warning Box (Triggers if Hydration > 12) -->
+          <div id="guardrailAlert" class="hidden text-left bg-amber-50 border border-amber-300 text-amber-900 rounded-lg p-3 text-xs space-y-1">
+            <div class="font-bold uppercase">⚠️ Expert Analysis Note (Dr. Emerson Smith, ¶ 16 & 25):</div>
+            <p>
+              GO OR NO GO™ does not enforce a maximum guardrail on Hydration Stations. Entering an unrealistically high number of stations inflates the score into a <strong>GO</strong> recommendation without verifying physical campus feasibility.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXHIBIT H REFERENCE GUIDE -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-5 py-3">
+          <h2 class="font-bold text-sm uppercase tracking-wider">Safety Score & Result Guide (Ex. H)</h2>
+        </div>
+        <div class="p-5 space-y-4 text-xs">
+          <div class="grid grid-cols-12 font-bold uppercase text-slate-500 border-b pb-2">
+            <div class="col-span-3">Score Range</div>
+            <div class="col-span-3">Result</div>
+            <div class="col-span-6">Guidance</div>
+          </div>
+          <div class="grid grid-cols-12 items-center border-b pb-3">
+            <div class="col-span-3 font-black text-sm text-rose-700">0 – 69</div>
+            <div class="col-span-3">
+              <span class="bg-rose-100 text-rose-800 font-extrabold px-2.5 py-1 rounded">NO GO</span>
+            </div>
+            <div class="col-span-6 text-slate-600">
+              Current conditions do not meet the recommended safety threshold. The event should not proceed under the conditions entered.
+            </div>
+          </div>
+          <div class="grid grid-cols-12 items-center">
+            <div class="col-span-3 font-black text-sm text-emerald-700">70 – 100</div>
+            <div class="col-span-3">
+              <span class="bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-1 rounded">GO</span>
+            </div>
+            <div class="col-span-6 text-slate-600">
+              Conditions meet the recommended safety threshold for the event to proceed.
+            </div>
+          </div>
+
+          <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-slate-600 leading-relaxed">
+            <strong class="text-slate-800 uppercase block mb-0.5">Important Disclaimer (Exhibit H):</strong>
+            The GO OR NO GO™ AI System is a decision-support tool. The accuracy of the recommendation depends on the accuracy of the information you enter and the weather forecast. A GO result reflects the conditions represented in that assessment and does not guarantee that planned safety measures were carried out.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- FULL-WIDTH AUDIT TRAIL TABLE (Styled after Exhibit F) -->
+    <section class="lg:col-span-12">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="font-bold text-sm uppercase tracking-wider">GO OR NO GO™ Official Audit Log (Exhibit F Format)</h2>
+            <p class="text-xs text-slate-300">Records every manual assessment submission, input variable set, safety score, and recommendation.</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <span>Total Entries: <strong id="totalEntriesCount" class="text-emerald-400">3 Assessments</strong></span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase text-xs font-extrabold border-b border-slate-200">
+                <th class="py-3 px-4">#</th>
+                <th class="py-3 px-4">Entry ID</th>
+                <th class="py-3 px-4">Timestamp (EDT)</th>
+                <th class="py-3 px-4">User</th>
+                <th class="py-3 px-4">Weather Input</th>
+                <th class="py-3 px-4">Input Variables</th>
+                <th class="py-3 px-4 text-center">Safety Score</th>
+                <th class="py-3 px-4 text-center">Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody" class="divide-y divide-slate-200">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-7xl mx-auto w-full px-4 py-6 text-center text-xs text-slate-400">
+    Built for the 2027 Massachusetts Bar Association High School Mock Trial Program • <em>Steph Shaw v. Martin's Landing Academy</em>
+  </footer>
+
+  <script>
+    // --- EXHIBIT C HISTORICAL WEATHER DATASET (Martin's Landing, MA) ---
+    const EXHIBIT_C_WEATHER = {
+      "2024-06-05": { location: "Martin's Landing, MA", temp: 102, heatIndex: 107, conditions: "Mostly Sunny" },
+      "2024-06-06": { location: "Martin's Landing, MA", temp: 106, heatIndex: 112, conditions: "Sunny" },
+      "2024-06-07": { location: "Martin's Landing, MA", temp: 105, heatIndex: 112, conditions: "Sunny" },
+      "2024-06-08": { location: "Martin's Landing, MA", temp: 88,  heatIndex: 92,  conditions: "Partly Cloudy" },
+      "2024-06-09": { location: "Martin's Landing, MA", temp: 82,  heatIndex: 85,  conditions: "Mostly Sunny" },
+      "2024-06-10": { location: "Martin's Landing, MA", temp: 77,  heatIndex: 80,  conditions: "Partly Cloudy" }
+    };
+
+    // Current active weather state (defaults to June 7, 2024 Step Ahead Day)
+    let currentWeather = { ...EXHIBIT_C_WEATHER["2024-06-07"] };
+    let entryCounter = 75; // Starts after A-00075 when Chalmers' log is preloaded
+    let auditEntries = [];
+
+    // --- SCORING ENGINE ---
+    // Calibrated so that at 112°F Heat Index (June 6/7, 2024):
+    // Run 1 (High, 2 stations, Limited shade, None breaks)        => 41 (NO GO)
+    // Run 2 (Moderate, 4 stations, Limited shade, Every 2 Hours)  => 53 (NO GO)
+    // Run 3 (Moderate, 6 stations, Moderate shade, Every 45 Min)  => 73 (GO)
+    // And with NO guardrails on Hydration Stations (per Dr. Emerson Smith's testimony)
+    function computeSafetyScore(heatIndex, activity, hydrationCount, shade, breaks) {
+      // Base score determined by Heat Index (at 112°F Heat Index, weatherBase = 45)
+      let weatherBase = 45 + Math.round((112 - heatIndex) * 0.95);
+
+      const activityMod = {
+        "High": -8,
+        "Moderate": -2,
+        "Low": 4
+      }[activity] ?? 0;
+
+      // Each hydration station adds +2 points without an upper cap (allowing Emerson Smith's manipulation test)
+      const hydrationMod = Math.max(0, Number(hydrationCount) || 0) * 2;
+
+      const shadeMod = {
+        "Limited": 0,
+        "Moderate": 11,
+        "Extensive": 20
+      }[shade] ?? 0;
+
+      const breaksMod = {
+        "None": 0,
+        "Every 2 Hours": 2,
+        "Every Hour": 5,
+        "Every 45 Minutes": 7,
+        "Every 30 Minutes": 10
+      }[breaks] ?? 0;
+
+      const rawScore = weatherBase + activityMod + hydrationMod + shadeMod + breaksMod;
+      return Math.max(0, Math.min(100, Math.round(rawScore)));
+    }
+
+    // --- UI HELPERS ---
+    function updateWeatherDisplay() {
+      document.getElementById("wxLocation").textContent = currentWeather.location;
+      document.getElementById("wxTemp").textContent = `${currentWeather.temp}°F`;
+      document.getElementById("wxHeatIndex").textContent = `${currentWeather.heatIndex}°F`;
+      document.getElementById("wxConditions").textContent = currentWeather.conditions;
+    }
+
+    function updateScoreCard(score, entryId, hydrationCount) {
+      const scoreCircle = document.getElementById("scoreCircle");
+      const scoreValue = document.getElementById("scoreValue");
+      const recBadge = document.getElementById("recBadge");
+      const recGuidance = document.getElementById("recGuidance");
+      const lastReadStamp = document.getElementById("lastReadStamp");
+      const guardrailAlert = document.getElementById("guardrailAlert");
+
+      scoreValue.textContent = score;
+      lastReadStamp.textContent = `Entry #${entryId}`;
+
+      const isGo = score >= 70;
+      if (isGo) {
+        scoreCircle.className = "w-36 h-36 rounded-full border-8 border-emerald-500 bg-emerald-50 flex flex-col items-center justify-center shadow-inner transition-all";
+        recBadge.className = "inline-block text-2xl font-black tracking-widest px-6 py-2 rounded-full bg-emerald-600 text-white shadow";
+        recBadge.textContent = "GO";
+        recGuidance.textContent = "Conditions meet the recommended safety threshold for the event to proceed.";
+      } else {
+        scoreCircle.className = "w-36 h-36 rounded-full border-8 border-rose-500 bg-rose-50 flex flex-col items-center justify-center shadow-inner transition-all";
+        recBadge.className = "inline-block text-2xl font-black tracking-widest px-6 py-2 rounded-full bg-rose-600 text-white shadow";
+        recBadge.textContent = "NO GO";
+        recGuidance.textContent = "Current conditions do not meet the recommended safety threshold. The event should not proceed under the conditions entered.";
+      }
+
+      // Show Dr. Emerson Smith's guardrail alert if user inputs unrealistic hydration stations (>10)
+      if (Number(hydrationCount) > 10) {
+        guardrailAlert.classList.remove("hidden");
+      } else {
+        guardrailAlert.classList.add("hidden");
+      }
+    }
+
+    function renderAuditTable() {
+      const tbody = document.getElementById("auditTableBody");
+      const countEl = document.getElementById("totalEntriesCount");
+      countEl.textContent = `${auditEntries.length} Assessment${auditEntries.length === 1 ? "" : "s"}`;
+
+      if (auditEntries.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-8 text-center text-slate-400 italic">
+              No assessments logged yet. Run an assessment above or click "Load Chalmers June 6, 2024 Audit Log".
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = auditEntries.map((item, idx) => {
+        const isGo = item.score >= 70;
+        const badgeClass = isGo
+          ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+          : "bg-rose-100 text-rose-800 border border-rose-300";
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3.5 px-4 font-bold text-slate-500">${idx + 1}</td>
+            <td class="py-3.5 px-4 font-mono font-bold text-slate-800">${item.entryId}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-600">${item.timestamp}</td>
+            <td class="py-3.5 px-4 font-semibold text-slate-800">${item.user}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-600">
+              <div class="font-bold text-slate-800">${item.weather.location}</div>
+              <div>Temp: ${item.weather.temp}°F | HI: <strong>${item.weather.heatIndex}°F</strong></div>
+              <div>${item.weather.conditions}</div>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-slate-700">
+              <ul class="list-disc list-inside space-y-0.5">
+                <li><strong>Activity Level:</strong> ${item.activity}</li>
+                <li><strong>Hydration Stations:</strong> ${item.hydration}</li>
+                <li><strong>Shade Coverage:</strong> ${item.shade}</li>
+                <li><strong>Scheduled Breaks:</strong> ${item.breaks}</li>
+              </ul>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="text-xl font-black text-slate-900">${item.score}</span>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="inline-block font-black text-xs px-3 py-1 rounded-full ${badgeClass}">
+                ${isGo ? "GO" : "NO GO"}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // --- LOAD CHALMERS' EXACT EXHIBIT F LOG ---
+    function loadChalmersAuditLog() {
+      currentWeather = { ...EXHIBIT_C_WEATHER["2024-06-07"] };
+      updateWeatherDisplay();
+
+      auditEntries = [
+        {
+          entryId: "A-00073",
+          timestamp: "4:12:03 PM<br>Jun 6, 2024",
+          user: "Cary Chalmers",
+          weather: { ...currentWeather },
+          activity: "High",
+          hydration: 2,
+          shade: "Limited",
+          breaks: "None",
+          score: 41
+        },
+        {
+          entryId: "A-00074",
+          timestamp: "4:21:17 PM<br>Jun 6, 2024",
+          user: "Cary Chalmers",
+          weather: { ...currentWeather },
+          activity: "Moderate",
+          hydration: 4,
+          shade: "Limited",
+          breaks: "Every 2 Hours",
+          score: 53
+        },
+        {
+          entryId: "A-00075",
+          timestamp: "4:30:08 PM<br>Jun 6, 2024",
+          user: "Cary Chalmers",
+          weather: { ...currentWeather },
+          activity: "Moderate",
+          hydration: 6,
+          shade: "Moderate",
+          breaks: "Every 45 Minutes",
+          score: 73
+        }
+      ];
+      entryCounter = 75;
+      updateScoreCard(73, "A-00075", 6);
+      renderAuditTable();
+    }
+
+    // --- LIVE WEATHER FETCH BY US ZIP CODE ---
+    // Uses Zippopotam.us (CORS-friendly, no key) + Open-Meteo API (CORS-friendly, no key)
+    async function fetchWeatherByZip(zip) {
+      const statusBadge = document.getElementById("weatherStatusBadge");
+      const cleanZip = zip.trim();
+      if (!/^\d{5}$/.test(cleanZip)) {
+        statusBadge.textContent = "❌ Please enter a valid 5-digit US Zip Code";
+        statusBadge.className = "text-xs font-bold text-rose-600";
+        return;
+      }
+
+      try {
+        statusBadge.textContent = "⏳ Looking up Zip Code coordinates...";
+        statusBadge.className = "text-xs font-semibold text-blue-600";
+
+        const zipRes = await fetch(`https://api.zippopotam.us/us/${cleanZip}`);
+        if (!zipRes.ok) throw new Error("Zip code not found");
+        const zipData = await zipRes.json();
+        const place = zipData.places[0];
+        const lat = place.latitude;
+        const lon = place.longitude;
+        const cityState = `${place["place name"]}, ${place["state abbreviation"]} (${cleanZip})`;
+
+        statusBadge.textContent = "⏳ Fetching live NOAA/Open-Meteo weather...";
+
+        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit`;
+        const wxRes = await fetch(wxUrl);
+        if (!wxRes.ok) throw new Error("Weather service unavailable");
+        const wxData = await wxRes.json();
+
+        const tempF = Math.round(wxData.current.temperature_2m);
+        const apparentF = Math.round(wxData.current.apparent_temperature);
+        const heatIndexF = Math.max(tempF, apparentF);
+        const code = wxData.current.weather_code;
+
+        const codeMap = {
+          0: "Clear Sky", 1: "Mainly Clear", 2: "Partly Cloudy", 3: "Overcast",
+          45: "Foggy", 48: "Foggy", 51: "Light Drizzle", 61: "Rain", 63: "Moderate Rain",
+          65: "Heavy Rain", 71: "Snow", 80: "Rain Showers", 95: "Thunderstorm"
+        };
+
+        currentWeather = {
+          location: cityState,
+          temp: tempF,
+          heatIndex: heatIndexF,
+          conditions: codeMap[code] || "Fair"
+        };
+
+        updateWeatherDisplay();
+        statusBadge.textContent = `✓ Live weather loaded for ${cityState}`;
+        statusBadge.className = "text-xs font-bold text-emerald-600";
+      } catch (err) {
+        statusBadge.textContent = `❌ Error: ${err.message}`;
+        statusBadge.className = "text-xs font-bold text-rose-600";
+      }
+    }
+
+    // --- EVENT LISTENERS ---
+    document.getElementById("modeLiveBtn").addEventListener("click", () => {
+      document.getElementById("modeLiveBtn").className = "px-3 py-1 text-xs font-bold rounded-md bg-blue-600 text-white transition";
+      document.getElementById("modeCaseBtn").className = "px-3 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+      document.getElementById("liveZipContainer").classList.remove("hidden");
+      document.getElementById("caseDateContainer").classList.add("hidden");
+    });
+
+    document.getElementById("modeCaseBtn").addEventListener("click", () => {
+      document.getElementById("modeCaseBtn").className = "px-3 py-1 text-xs font-bold rounded-md bg-blue-600 text-white transition";
+      document.getElementById("modeLiveBtn").className = "px-3 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+      document.getElementById("caseDateContainer").classList.remove("hidden");
+      document.getElementById("liveZipContainer").classList.add("hidden");
+
+      const selectedDate = document.getElementById("caseDateSelect").value;
+      currentWeather = { ...EXHIBIT_C_WEATHER[selectedDate] };
+      updateWeatherDisplay();
+      document.getElementById("weatherStatusBadge").textContent = `✓ Loaded Exhibit C (${selectedDate})`;
+      document.getElementById("weatherStatusBadge").className = "text-xs font-bold text-emerald-600";
+    });
+
+    document.getElementById("caseDateSelect").addEventListener("change", (e) => {
+      const selectedDate = e.target.value;
+      currentWeather = { ...EXHIBIT_C_WEATHER[selectedDate] };
+      updateWeatherDisplay();
+      document.getElementById("weatherStatusBadge").textContent = `✓ Loaded Exhibit C (${selectedDate})`;
+    });
+
+    document.getElementById("fetchWeatherBtn").addEventListener("click", () => {
+      const zip = document.getElementById("zipInput").value;
+      fetchWeatherByZip(zip);
+    });
+
+    // Quick-fill preset buttons for Exhibit F runs 1, 2, 3
+    document.querySelectorAll(".preset-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const preset = btn.getAttribute("data-preset");
+        // Ensure June 7, 2024 weather is active so scores match Exhibit F (41, 53, 73)
+        currentWeather = { ...EXHIBIT_C_WEATHER["2024-06-07"] };
+        updateWeather
